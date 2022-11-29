@@ -1,7 +1,14 @@
 name: 'CI'
-on: [push, pull_request]
+on:
+  pull_request:
+    types: [ closed ]
+    branches:
+      - main
+    push:
+      branches:
+        - '**'
 jobs:
-  ci:
+  tests:
     runs-on: ubuntu-latest
     steps:
     - name: 'Checkout'
@@ -16,3 +23,22 @@ jobs:
       run: poetry install --no-interaction --no-root
     - name: 'Run unit-tests'
       run: poetry run pytest
+  publish:
+    if: github.ref == 'master'
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+      - name: 'Set up Python'
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: 'Set up Poetry'
+        uses: snok/install-poetry@v1
+      - name: 'Install dependencies'
+        run: poetry install --no-interaction --no-root
+      - name: 'Build version'
+        run: poetry build
+      - name: 'Publish version'
+        run: poetry publish
