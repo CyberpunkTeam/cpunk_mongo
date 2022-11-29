@@ -3,6 +3,6 @@ pip install poetry
 poetry config virtualenvs.create false \
   && poetry install --no-interaction --no-ansi
 
-coverage run --source=app -m pytest tests/
+coverage run --source=cpunk_mongo -m pytest tests/
 
 coveralls
