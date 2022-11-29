@@ -3,7 +3,7 @@ from json import loads
 import mongomock
 
 from cpunk_mongo.db import DataBase
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 
 
@@ -155,21 +155,53 @@ def test_delete_one():
     assert len(result) == 0
 
 
+@mongomock.patch(servers=(("server.example.com", 27017),))
+def test_get_complex_item():
+    db = create_db()
+    item_id = "145123213"
+    price = 100.4
+    features = [Feature(name="color", value="red"), Feature(name="size", value="small")]
+    item = create_item(item_id, price, features=features)
+
+    db.save(collection_name="items", item_to_save=item)
+
+    result = db.find_by(
+        collection_name="items", param="item_id", value=item_id, output_model=Item
+    )
+
+    assert len(result) == 1
+    assert len(result[0].features) == 2
+    features = result[0].features
+    feature_1 = features[0]
+    assert feature_1.name == "color"
+    assert feature_1.value == "red"
+
+
+class Feature(BaseModel):
+    name: str
+    value: str
+
+
 class Item(BaseModel):
     item_id: str
     price: float
     currency_id: Optional[str] = "ARG"
+    features: List[Feature] = []
 
     def to_json(self):
         return loads(self.json(exclude_defaults=True))
 
     @staticmethod
     def get_schema():
-        return {"item_id": str, "price": float, "currency_id": str}
+        return {"item_id": str, "price": float, "currency_id": str, "features": list}
 
 
-def create_item(item_id, price, currency_id=None):
-    item = Item(item_id=item_id, price=price, currency_id=currency_id)
+def create_item(item_id, price, currency_id=None, features=None):
+    if features is None:
+        features = []
+    item = Item(
+        item_id=item_id, price=price, currency_id=currency_id, features=features
+    )
     return item
 
 
