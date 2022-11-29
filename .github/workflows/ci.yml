@@ -4,9 +4,9 @@ on:
     types: [ closed ]
     branches:
       - master
-    push:
-      branches:
-        - '**'
+  push:
+    branches:
+      - '**'
 jobs:
   tests:
     runs-on: ubuntu-latest
