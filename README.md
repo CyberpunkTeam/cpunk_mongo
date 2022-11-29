@@ -1,5 +1,9 @@
 # Cpunk Mongo
+[![CI](https://github.com/CyberpunkTeam/cpunk_mongo/actions/workflows/ci.yml/badge.svg)](https://github.com/CyberpunkTeam/cpunk_mongo/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/CyberpunkTeam/cpunk_mongo/badge.svg?branch=release/0.2.0)](https://coveralls.io/github/CyberpunkTeam/cpunk_mongo?branch=release/0.2.0)
+
 It's a lib for working with MongoDB
+
 
 ## Usage
 
