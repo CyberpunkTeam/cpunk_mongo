@@ -3,10 +3,10 @@ on:
   pull_request:
     types: [ closed ]
     branches:
-      - main
-    push:
-      branches:
-        - '**'
+      - master
+  push:
+    branches:
+      - '**'
 jobs:
   tests:
     runs-on: ubuntu-latest
