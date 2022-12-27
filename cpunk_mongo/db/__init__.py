@@ -50,6 +50,32 @@ class DataBase:
             )
         return result
 
+    def ilike(self, collection_name, fields, value, output_model):
+        results = []
+        for field in fields:
+            result_i = self.db[collection_name].find(
+                {field: {"$regex": value, "$options": "i"}}
+            )
+            results += result_i
+
+        result = loads(dumps(results, default=str))
+        if output_model is not None:
+            result = list(
+                map(lambda item: Transform.json_to_model(output_model, item), result)
+            )
+
+        ids = {}
+        final_result = []
+        if len(fields) > 1:
+            for result_i in result:
+                m_id = result_i.get_id()
+                if not (m_id in ids):
+                    final_result.append(result_i)
+                    ids[m_id] = True
+        else:
+            final_result = result
+        return final_result
+
 
 class Transform:
     @staticmethod

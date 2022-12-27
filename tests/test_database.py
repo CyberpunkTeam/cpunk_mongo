@@ -177,6 +177,86 @@ def test_get_complex_item():
     assert feature_1.value == "red"
 
 
+@mongomock.patch(servers=(("server.example.com", 27017),))
+def test_like():
+    db = create_db()
+    user_1 = User(uid="1", name="Matias", lastname="Fonseca")
+    user_2 = User(uid="2", name="Marcos", lastname="Lopez")
+    user_3 = User(uid="3", name="Gonzalo", lastname="Marino")
+    user_4 = User(uid="4", name="Jorge", lastname="Lopez")
+    ok = db.save(collection_name="users", item_to_save=user_1)
+    assert ok is True
+
+    ok = db.save(collection_name="users", item_to_save=user_2)
+    assert ok is True
+
+    ok = db.save(collection_name="users", item_to_save=user_3)
+    assert ok is True
+
+    ok = db.save(collection_name="users", item_to_save=user_4)
+    assert ok is True
+
+    # filter by one field
+    value = "mar"
+
+    result = db.ilike(
+        collection_name="users", fields=["name"], value=value, output_model=User
+    )
+
+    assert len(result) == 1
+
+    # filter by two field
+    value = "op"
+
+    result = db.ilike(
+        collection_name="users",
+        fields=["name", "lastname"],
+        value=value,
+        output_model=User,
+    )
+
+    assert len(result) == 2
+
+    value = "m"
+
+    result = db.ilike(
+        collection_name="users",
+        fields=["name", "lastname"],
+        value=value,
+        output_model=User,
+    )
+
+    assert len(result) == 3
+
+    # Remove duplicates
+    value = "a"
+
+    result = db.ilike(
+        collection_name="users",
+        fields=["name", "lastname"],
+        value=value,
+        output_model=User,
+    )
+
+    assert len(result) == 3
+
+
+class User(BaseModel):
+    name: str
+    lastname: str
+    uid: str
+
+    def get_id(self):
+        return self.uid
+
+    def to_json(self):
+        return loads(self.json(exclude_defaults=True))
+
+    @staticmethod
+    def get_schema():
+        return {"uid": str, "name": str, "lastname": str}
+
+
 class Feature(BaseModel):
     name: str
     value: str
