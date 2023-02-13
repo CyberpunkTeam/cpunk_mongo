@@ -1,3 +1,10 @@
+#V0.4.0
+
+##Added
+### methods:
+- save_many
+
+
 #V0.3.0
 
 ##Added
