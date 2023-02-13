@@ -24,6 +24,24 @@ def test_insert_item():
 
 
 @mongomock.patch(servers=(("server.example.com", 27017),))
+def test_insert_many_items():
+    db = create_db()
+    item_id_1 = "145123213"
+    item_id_2 = "145123212"
+    price = 100.4
+    item_1 = create_item(item_id_1, price)
+    item_2 = create_item(item_id_2, price)
+    ok = db.save_many(collection_name="items", items_to_save=[item_1, item_2])
+    assert ok is True
+
+    result = db.find_by(collection_name="items", param="item_id", value=item_id_1)
+    assert len(result) == 1
+
+    result = db.find_by(collection_name="items", param="item_id", value=item_id_2)
+    assert len(result) == 1
+
+
+@mongomock.patch(servers=(("server.example.com", 27017),))
 def test_get_item():
     db = create_db()
     item_id = "145123213"

@@ -12,6 +12,11 @@ class DataBase:
         self.db[collection_name].insert_one(item_to_save.to_json())
         return True
 
+    def save_many(self, collection_name, items_to_save):
+        items_parsed = [item.to_json() for item in items_to_save]
+        self.db[collection_name].insert_many(items_parsed)
+        return True
+
     def update(self, collection_name, param_filter, value, new_document):
         self.db[collection_name].find_one_and_update(
             filter={param_filter: value}, update={"$set": new_document.to_json()}
